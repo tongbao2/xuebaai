@@ -1,0 +1,19 @@
+﻿# 构建产物（本地运行产出，不上传）
+dist/
+build/
+*.spec
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# 模型文件（本地下载，不上传）
+models/
+*.gguf
+
+# 操作系统
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
