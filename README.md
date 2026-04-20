@@ -13,14 +13,17 @@
 
 ## 快速开始
 
-### 方式一：直接运行构建好的 EXE
+### 方式一：构建 EXE 后运行（推荐）
 
 ```bash
-cd study-ai/dist
-双击 "学霸帝AI.exe"
+# 双击 build.bat，等待打包完成（约2分钟）
+# 打包后的 exe 在 dist/ 学霸帝AI.exe
+
+cd dist
+学霸帝AI.exe
 ```
 
-### 方式二：从源码运行
+### 方式二：从源码运行（开发模式）
 
 ```bash
 pip install requests customtkinter
