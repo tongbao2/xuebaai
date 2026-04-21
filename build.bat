@@ -100,7 +100,7 @@ pyinstaller ^
     --name "学霸帝AI" ^
     --onefile ^
     --windowed ^
-    --icon "%PROJECT_DIR%\assets\icon.ico" ^
+    --icon NONE ^
     --add-data "%PROJECT_DIR%\config.py;." ^
     --add-data "%PROJECT_DIR%\llama_client.py;." ^
     --hidden-import requests ^
@@ -137,15 +137,15 @@ copy /y "%PROJECT_DIR%\llama_client.py" "%DIST_DIR%\" >nul 2>&1
 echo 学霸帝AI  -  使用说明
 echo ================================
 echo.
-echo 1. 【下载模型】
-echo    首次运行，点击界面中的"下载模型"
-echo    主模型: gemma-4-E2B-it-Q4_K_M.gguf (~3GB)
-echo    备用:   qwen2.5-0.5b-instruct-q4_k_m.gguf (~400MB)
+echo 1. 【下载模型（请选择一个放入 models/ 目录）】
+echo    - Qwen2.5-0.5B-IT Q4_K_M (~400MB)
+echo      https://www.modelscope.cn/models/Qwen/Qwen2.5-0.5B-Instruct-GGUF/resolve/master/qwen2.5-0.5b-instruct-q4_k_m.gguf
+echo    - DeepSeek-R1-Distill-Qwen-1.5B Q4_K_M (~900MB)
+echo      https://www.modelscope.cn/models/unsloth/DeepSeek-R1-Distill-Qwen-1.5B-GGUF/resolve/master/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf
 echo.
-echo 2. 【手动下载模型】
-echo    如果下载失败，请手动下载 GGUF 文件：
-echo    https://www.modelscope.cn/models/unsloth/gemma-4-E2B-it-GGUF/resolve/master/gemma-4-E2B-it-Q4_K_M.gguf
-echo    将 .gguf 文件放到本目录的 models 文件夹中
+echo 2. 【下载说明】
+echo    如果自动下载失败，请复制上方链接手动下载
+echo    将 .gguf 文件放到 models/ 目录中
 echo.
 echo 3. 【加载模型】
 echo    模型下载完成后，点击"加载模型"
@@ -172,7 +172,7 @@ echo   模型目录: %DIST_DIR%\models\
 echo.
 echo   【首次使用必读】
 echo   1. 启动 学霸帝AI.exe
-echo   2. 点击"下载模型"（约需下载 3GB）
+echo   2. 下载模型到 models/ 目录（Qwen~400MB / DeepSeek~900MB）
 echo   3. 模型下载完成后点击"加载模型"
 echo   4. 开始对话！
 echo ==========================================

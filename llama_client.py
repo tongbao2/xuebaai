@@ -10,13 +10,15 @@ class LlamaClient:
     """封装 llama-server HTTP API"""
 
     def __init__(self, model_path: str, port: int = 8080,
-                 ctx_size: int = 8192, threads: int = 4, ngl: int = 0):
+                 ctx_size: int = 8192, threads: int = 4, ngl: int = 0,
+                 mmproj: str = None):
         self.model_path = model_path
         self.base_url = f"http://127.0.0.1:{port}"
         self.port = port
         self.ctx_size = ctx_size
         self.threads = threads
         self.ngl = ngl
+        self.mmproj = mmproj          # vision 投影文件路径（可为空）
         self._proc = None
         self._loaded = False
 
