@@ -6,9 +6,24 @@
 import os
 import sys
 
+# Fix console encoding for print with emoji/special chars
+if getattr(sys, 'frozen', False):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
 _ocr = None
 _ocr_available = False
 _IMPORT_ERROR = None
+
+
+def _get_rapidocr_path():
+    """获取 rapidocr_onnxruntime 包的根路径（兼容 PyInstaller）"""
+    if getattr(sys, 'frozen', False):
+        # PyInstaller --onefile: 数据解压到 sys._MEIPASS
+        return os.path.join(sys._MEIPASS, 'rapidocr_onnxruntime')
+    else:
+        import rapidocr_onnxruntime
+        return os.path.dirname(rapidocr_onnxruntime.__file__)
 
 
 def _init_ocr():
@@ -19,9 +34,17 @@ def _init_ocr():
 
     try:
         from rapidocr_onnxruntime import RapidOCR
-        _ocr = RapidOCR()
-        _ocr_available = True
-        print("[OCR] RapidOCR 初始化成功")
+        # 指定模型目录
+        rapidocr_root = _get_rapidocr_path()
+        config_path = os.path.join(rapidocr_root, 'config.yaml')
+        if os.path.exists(config_path):
+            _ocr = RapidOCR(config_path)
+            _ocr_available = True
+            print(f"[OCR] RapidOCR 初始化成功 (config: {config_path})")
+        else:
+            _ocr = RapidOCR()
+            _ocr_available = True
+            print("[OCR] RapidOCR 初始化成功 (default config)")
     except ImportError:
         _IMPORT_ERROR = "rapidocr_onnxruntime 未安装，请运行: pip install rapidocr_onnxruntime"
         print("[OCR]", _IMPORT_ERROR)

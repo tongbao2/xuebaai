@@ -690,6 +690,10 @@ class App(ctk.CTk if HAS_CTK else tk.Tk):
 # ══════════════════════════════════════════════
 
 def main():
+    # Fix Windows GBK console encoding (emoji in print)
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+
     # PyInstaller 路径修正
     if getattr(sys, "frozen", False):
         app_dir = os.path.dirname(sys.executable)
