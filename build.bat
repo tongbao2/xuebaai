@@ -26,7 +26,7 @@ echo.
 
 :: ── Step 1: 安装 Python 依赖 ──────────────────────────
 echo [Step 1/4] 安装 Python 依赖...
-pip install --quiet requests customtkinter pyinstaller
+pip install --quiet requests customtkinter pyinstaller Pillow rapidocr_onnxruntime
 if errorlevel 1 (
     echo [ERROR] 依赖安装失败，尝试 pip install requests customtkinter pyinstaller
     pause
@@ -103,8 +103,11 @@ pyinstaller ^
     --icon "%PROJECT_DIR%\assets\icon.ico" ^
     --add-data "%PROJECT_DIR%\config.py;." ^
     --add-data "%PROJECT_DIR%\llama_client.py;." ^
+    --add-data "%PROJECT_DIR%\ocr_engine.py;." ^
     --hidden-import requests ^
     --hidden-import customtkinter ^
+    --hidden-import rapidocr_onnxruntime ^
+    --hidden-import paddleocr ^
     --collect-all customtkinter ^
     --noconfirm ^
     --distpath "%PROJECT_DIR%\dist" ^
@@ -131,6 +134,7 @@ if not exist "%DIST_DIR%\models" mkdir "%DIST_DIR%\models"
 :: 复制 config.py 和 llama_client.py
 copy /y "%PROJECT_DIR%\config.py" "%DIST_DIR%\" >nul 2>&1
 copy /y "%PROJECT_DIR%\llama_client.py" "%DIST_DIR%\" >nul 2>&1
+copy /y "%PROJECT_DIR%\ocr_engine.py" "%DIST_DIR%\" >nul 2>&1
 
 :: 写入说明
 (

@@ -6,7 +6,8 @@ GGUF离线大模型 + llama.cpp + customtkinter
 import os, sys, json, time, subprocess, threading, queue, re
 import tkinter as tk
 import tkinter.ttk as ttk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
+from PIL import Image, ImageTk
 
 try:
     import requests
@@ -34,6 +35,7 @@ except ImportError:
 
 import config
 from llama_client import LlamaClient
+from ocr_engine import recognize_file, is_available as ocr_available, get_error as ocr_error
 
 
 # ══════════════════════════════════════════════
@@ -280,6 +282,8 @@ class App(ctk.CTk if HAS_CTK else tk.Tk):
             "下载完成后点击「加载模型」启动推理引擎。\n\n"
             "⚡ 支持 GGUF 格式模型，本地离线运行，\n"
             "   无需联网，保护隐私。\n\n"
+            "📷 支持 图片OCR文字识别（中英混排），\n"
+            "   点击「📷 OCR」上传图片即可识别。\n\n"
             "💡 快捷键：Ctrl+Enter 发送\n"
             "━━━━━━━━━━━━━━━━━━━━\n\n"
         )
@@ -312,6 +316,14 @@ class App(ctk.CTk if HAS_CTK else tk.Tk):
             command=self._on_send, state="disabled",
         )
         self._send_btn.pack(side="right")
+
+        self._ocr_btn = ctk.CTkButton(
+            act_f, text="📷 OCR", width=80, height=34,
+            font=FONT, corner_radius=8,
+            fg_color="#1d6f42", hover_color="#15803d",
+            command=self._on_pick_image,
+        )
+        self._ocr_btn.pack(side="right", padx=(0, 8))
 
         self._stop_btn = ctk.CTkButton(
             act_f, text="⏹ 停止", width=80, height=34,
@@ -542,6 +554,48 @@ class App(ctk.CTk if HAS_CTK else tk.Tk):
         self._refresh_ui("⚠️ 模型已卸载")
         self._chat_append("sys", "模型已卸载。")
 
+    # ── 图片 OCR ────────────────────────────────
+
+    def _on_pick_image(self):
+        """选择图片并识别文字"""
+        path = filedialog.askopenfilename(
+            title="选择图片",
+            filetypes=[
+                ("图片文件", "*.png *.jpg *.jpeg *.bmp *.tiff *.webp"),
+                ("所有文件", "*.*"),
+            ],
+        )
+        if not path:
+            return
+
+        # 检查 OCR 可用性
+        if not ocr_available():
+            err = ocr_error() or ""
+            messagebox.showwarning("OCR 不可用",
+                f"无法进行文字识别。\n{err}\n\n请运行: pip install rapidocr_onnxruntime")
+            return
+
+        self._chat_append("sys", f"📷 正在识别图片: {os.path.basename(path)}")
+
+        def ocr_task():
+            recognized = recognize_file(path)
+            if recognized:
+                preview = recognized[:300] + ("..." if len(recognized) > 300 else "")
+                self.after(0, lambda: self._chat_append("sys",
+                    f"✅ 识别成功（共 {len(recognized)} 字）:\n{preview}"))
+                # 将识别结果和路径存起来，等发送时拼入 prompt
+                self._pending_ocr = {"path": path, "text": recognized}
+            else:
+                self.after(0, lambda: self._chat_append("sys",
+                    "⚠️ 未识别到文字，可能图片模糊或无文字内容"))
+                self._pending_ocr = None
+
+            # 在输入框插入提示
+            self.after(0, lambda: self._inp.insert("1.0",
+                f"[图片OCR: {os.path.basename(path)}] "))
+
+        threading.Thread(target=ocr_task, daemon=True).start()
+
     # ── 发送 ────────────────────────────────────
 
     def _on_send(self):
@@ -551,7 +605,19 @@ class App(ctk.CTk if HAS_CTK else tk.Tk):
         if not text:
             return
         self._inp.delete("1.0", "end")
-        self._chat_append("usr", text)
+
+        # 取出 OCR 结果
+        ocr_info = getattr(self, '_pending_ocr', None)
+        self._pending_ocr = None
+        ocr_text = ocr_info["text"] if ocr_info else None
+        image_name = ocr_info["path"] if ocr_info else None
+
+        # 显示用户消息
+        if ocr_text:
+            display = f"📷 [{os.path.basename(image_name)}]\n{text or '(请分析图片内容)'}"
+        else:
+            display = text
+        self._chat_append("usr", display)
 
         _state.generating = True
         _state.stop_flag.clear()
@@ -565,13 +631,20 @@ class App(ctk.CTk if HAS_CTK else tk.Tk):
                 "请用中文回答，简洁有条理，适当使用列表或分段。\n"
                 "回答内容应准确、有帮助，符合学生和老师的使用习惯。"
             )
+
+            # 拼接 OCR 文字到 prompt
+            if ocr_text:
+                prompt = f"[图片识别到的文字内容]:\n{ocr_text}\n\n[用户问题]: {text or '请分析上述图片中的文字内容'}"
+            else:
+                prompt = text
+
             buf = []
             ctx = self._chat_stream("ai", "")
 
             try:
                 with ctx:
                     for tok in client.infer_stream(
-                        prompt=text,
+                        prompt=prompt,
                         system=system,
                         max_tokens=self._mt_v.get(),
                         temperature=self._temp_v.get(),
@@ -630,6 +703,7 @@ def main():
     print(f"  模型目录: {config.MODEL_DIR}")
     print(f"  llama目录: {config.LLAMA_DIR}")
     print(f"  默认模型: {config.MODELS[config.DEFAULT_MODEL_KEY]['name']}")
+    print(f"  OCR引擎: {'✅ RapidOCR' if ocr_available() else '❌ 未安装'}")
     print("=" * 50)
 
     App().mainloop()
