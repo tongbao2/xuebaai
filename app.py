@@ -691,8 +691,11 @@ class App(ctk.CTk if HAS_CTK else tk.Tk):
 
 def main():
     # Fix Windows GBK console encoding (emoji in print)
-    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
-    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    # PyInstaller --noconsole 模式下 sys.stdout/stderr 为 None
+    if sys.stdout:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    if sys.stderr:
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
     # PyInstaller 路径修正
     if getattr(sys, "frozen", False):

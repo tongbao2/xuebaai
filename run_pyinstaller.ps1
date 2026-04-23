@@ -15,6 +15,7 @@ pyinstaller `
     --hidden-import requests `
     --hidden-import customtkinter `
     --collect-all customtkinter `
+    --collect-all rapidocr_onnxruntime `
     --exclude-module torch `
     --exclude-module torchvision `
     --exclude-module transformers `
