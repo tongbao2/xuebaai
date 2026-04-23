@@ -1,4 +1,4 @@
-﻿# 构建产物（本地运行产出，不上传）
+# 构建产物（本地运行产出，不上传）
 dist/
 build/
 *.spec
@@ -17,3 +17,5 @@ Thumbs.db
 
 # 日志
 *.log
+llama.cpp/
+rapidocr_onnxruntime/
