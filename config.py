@@ -31,7 +31,7 @@ MODELS = {
     },
 }
 
-DEFAULT_MODEL_KEY = "deepseek-1.5B"
+DEFAULT_MODEL_KEY = "qwen-0.5B"
 
 # llama-server 默认参数
 LLAMA_PORT = 8080
