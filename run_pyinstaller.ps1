@@ -15,6 +15,18 @@ pyinstaller `
     --hidden-import requests `
     --hidden-import customtkinter `
     --collect-all customtkinter `
+    --exclude-module torch `
+    --exclude-module torchvision `
+    --exclude-module transformers `
+    --exclude-module tensorflow `
+    --exclude-module tensorboard `
+    --exclude-module sympy `
+    --exclude-module matplotlib `
+    --exclude-module scipy `
+    --exclude-module scikit-learn `
+    --exclude-module sklearn `
+    --exclude-module paddle `
+    --exclude-module paddleocr `
     --noconfirm `
     "app.py"
 

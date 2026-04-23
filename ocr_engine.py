@@ -8,8 +8,10 @@ import sys
 
 # Fix console encoding for print with emoji/special chars
 if getattr(sys, 'frozen', False):
-    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
-    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+    if sys.stdout:
+        sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    if sys.stderr:
+        sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 
 _ocr = None
 _ocr_available = False
