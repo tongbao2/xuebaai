@@ -22,6 +22,13 @@ MODELS = {
         "filename": "qwen2.5-0.5b-instruct-q4_k_m.gguf",
         "size_mb": "~400",
     },
+    "deepseek-1.5B": {
+        "name": "DeepSeek-R1-Distill-Qwen-1.5B Q4_K_M",
+        "url": "https://www.modelscope.cn/models/unsloth/DeepSeek-R1-Distill-Qwen-1.5B-GGUF/resolve/master/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf",
+        "filename": "DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf",
+        "size_mb": "~1100",
+        "fallback": "https://huggingface.co/unsloth/DeepSeek-R1-Distill-Qwen-1.5B-GGUF/resolve/main/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf",
+    },
 }
 
 DEFAULT_MODEL_KEY = "gemma-4-E2B"
